@@ -170,7 +170,12 @@ void tools::gcc::Common::ConstructJob(Compilation &C, const JobAction &JA,
   } else
     GCCName = "gcc";
 
-  const char *Exec = Args.MakeArgString(getToolChain().GetProgramPath(GCCName));
+  const char *Exec;
+  if (llvm::sys::fs::exists(GCCName))
+    Exec = GCCName;
+  else
+    Exec = Args.MakeArgString(getToolChain().GetProgramPath(GCCName));
+
   C.addCommand(std::make_unique<Command>(JA, *this,
                                          ResponseFileSupport::AtFileCurCP(),
                                          Exec, CmdArgs, Inputs, Output));
